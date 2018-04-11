@@ -1,0 +1,21 @@
+#!/bin/bash
+if [ $# -ne 1 ]
+then
+echo "Usage: PodDiskDistribution <number of disk per pod>"
+exit 1
+fi
+rm -f /tmp/disklist.txt
+rm -f /tmp/pod*
+NUM_DISK_PER_POD=$1
+for i in `lsscsi|awk '{print $6}'`; 
+do 
+fdisk -l $i 2>&1|grep -i linux  >/dev/null
+if [ $? -eq 0 ]
+then
+continue; 
+fi
+echo $i >>/tmp/disklist.txt;
+done
+TOTAL_AVAILABLE_DISKS=`cat /tmp/disklist.txt|wc -l`
+NUM_OF_POD_PER_NODE=$((TOTAL_AVAILABLE_DISKS/NUM_DISK_PER_POD))
+split -l $NUM_DISK_PER_POD /tmp/disklist.txt /tmp/pod

@@ -1,0 +1,100 @@
+#!/bin/bash
+set -x;
+#MAPR_UID=5000
+#MAPR_GID=5000
+#MAPR_CLDB_HOSTS="cldb-0.cldb-svc.mapr-cluster.svc.cluster.local"
+#MAPR_ZK_HOSTS="zk-0.zk-svc.mapr-cluster.svc.cluster.local"
+#DISKARGS=12
+#MAPR_CLUSTER=archerx
+#MAPR_USER=mapr
+#MAPR_ROOT_PASSWORD=mapr
+#MAPR_PASSWORD=mapr
+NO=false
+YES=true
+MAPR_BACKUP=${MAPR_BACKUP:-/tmp/backup}
+MAPR_HOME=${MAPR_HOME:-/opt/mapr}
+MEM_TOTAL=6291456
+SECURE_CLUSTER=$NO
+
+changeHostId() {
+	/opt/mapr/server/mruuidgen > /opt/mapr/hostid
+	cat /opt/mapr/hostid > /opt/mapr/conf/hostid.$$
+}
+
+addMapRUser() {
+        groupadd -g $MAPR_GID mapr >>/tmp/init_script.log 2>&1
+        useradd -u $MAPR_UID -g $MAPR_GID mapr >>/tmp/init_script.log 2>&1
+}
+
+backup() {
+	echo "taking backup" >>/tmp/init_script.log 2>&1
+	cp -pr /opt/mapr/conf /tmp/backup/ 
+	cp -p /opt/mapr/hostid /tmp/backup
+}
+
+startWarden() {
+        service mapr-warden start
+}
+
+runConfigure() {
+	 if [ -f $MAPR_HOME/conf/disktab ]
+           then
+                echo "disktab file already exist"  >>/tmp/init_script.log 2>&1
+		/opt/mapr/server/configure.sh -C $MAPR_CLDB_HOSTS -Z $MAPR_ZK_HOSTS -N $MAPR_CLUSTER -M7 >>/tmp/init_script.log 2>&1
+                startWarden
+           else
+                /opt/mapr/server/configure.sh -C $MAPR_CLDB_HOSTS -Z $MAPR_ZK_HOSTS -F /tmp/diskfile.txt -disk-opts FW$DISKARGS -N $MAPR_CLUSTER -M7 >>/tmp/init_script.log 2>&1
+        fi
+}
+
+setNodeMemory()  {
+
+	MEMTOTAL=$MAPR_MEMORY
+	MEMTOTAL=`expr $MAPR_MEMORY / 1024`
+	cp /proc/meminfo /opt/mapr/conf/meminfofake
+	sed -i "/^MemTotal/ s/^.*$/MemTotal:     ${MEMTOTAL} kB/" /opt/mapr/conf/meminfofake
+	sed -i "/^MemFree/ s/^.*$/MemFree:     ${MEMTOTAL-10} kB/" /opt/mapr/conf/meminfofake
+	sed -i "/^MemAvailable/ s/^.*$/MemAvailable:     ${MEMTOTAL-10} kB/" /opt/mapr/conf/meminfofake
+	sed -i 's!/proc/meminfo!/opt/mapr/conf/meminfofake!' /opt/mapr/server/initscripts-common.sh
+}
+
+
+set_environment() {
+    # Import our environment variables from systemd
+    while read -r e; do
+        eval "export $e"
+    done <<< "$(tr "\000" "\n" < /proc/1/environ)"
+
+    # Copy modified conf files to container
+    if [ -d $MAPR_BACKUP/conf ]; then
+        cp -p $MAPR_BACKUP/conf/* $MAPR_HOME/conf/
+	cp -p $MAPR_BACKUP/hostid $MAPR_HOME/
+    else
+         echo "Conf file replacement volume not connected"
+	 changeHostId
+    fi
+    printenv >>/tmp/init_script.log 2>&1
+    echo "MAPR_USER is $MAPR_USER" >>/tmp/init_script.log 2>&1
+    echo "success $YES"
+}
+changePasswd() {
+        echo "root:$MAPR_ROOT_PASSWORD" | chpasswd
+        echo "$MAPR_USER:$MAPR_PASSWORD" | chpasswd
+}
+
+
+
+#######################################
+###########INIT SCRIPT#################
+#######################################
+echo "++++++++++++++++++++++++" >>/tmp/init_script.log 2>&1
+set_environment
+echo "++++++++++++++++++++++++" >>/tmp/init_script.log 2>&1
+echo $MAPR_UID >>/tmp/init_script.log 2>&1
+echo $MAPR_GID >>/tmp/init_script.log 2>&1
+addMapRUser
+changePasswd
+setNodeMemory
+runConfigure
+backup
+echo "Successfully setup the node" >>/tmp/init_script.log 2>&1

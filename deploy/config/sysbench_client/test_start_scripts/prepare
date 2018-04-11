@@ -1,0 +1,4 @@
+#/bin/bash
+set -x
+SYSBENCH_PREPARE_DIR=/`ls / |grep vol`
+cd $SYSBENCH_PREPARE_DIR;sysbench --test=fileio --file-total-size=500G --file-num=320 prepare &

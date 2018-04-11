@@ -1,0 +1,12 @@
+#!/bin/bash
+mv /etc/systemd/system/mapr-docker.service /tmp >>/tmp/init_script.log 2>&1
+cp /tmp/backup/cldb.service /etc/systemd/system/ >>/tmp/init_script.log 2>&1
+cp /tmp/backup/cldb-init-script /tmp/cldb-init-script >>/tmp/init_script.log 2>&1
+systemctl daemon reload
+systemctl enable cldb.service
+env >>/tmp/init_script.log 2>&1
+exec /sbin/init
+while true
+do
+sleep 5
+done

@@ -1,0 +1,9 @@
+#!/bin/bash
+echo "hello"
+#cp /tmp/backup/cldb.service /etc/systemd/system/
+#mv /etc/systemd/system/mapr-docker.service /tmp/
+#systemctl daemon-reload
+#systemctl enable cldb.service
+#sleep 60
+#exec /sbin/init
+sleep infinity

@@ -1,0 +1,35 @@
+# Copyright (c) 2009 & onwards. MapR Tech, Inc., All rights reserved
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sysbench-client 
+  namespace: sysbench-tests
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: role
+            operator: In
+            values:
+            - data
+  containers:
+  - name: pgbench
+    image: centos:7
+    args:
+    - sleep
+    - "1000000"
+    volumeMounts:
+    - mountPath: /vol8
+      name: maprflex
+  volumes:
+    - name: maprflex
+      flexVolume:
+        driver: "mapr.com/maprfs"
+        options:
+          volumePath: "/vol8"
+          cluster: "archerx"
+          platinum: "true"
+          cldbHosts: "10.47.0.2 10.41.128.2"
+          securityType: "unsecure"

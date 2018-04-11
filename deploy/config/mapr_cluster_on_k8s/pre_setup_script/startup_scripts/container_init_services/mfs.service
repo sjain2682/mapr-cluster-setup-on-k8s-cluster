@@ -1,0 +1,10 @@
+[Unit]
+Description=init mapr cluster
+
+[Service]
+Type=simple
+ExecStart=/tmp/mfs-init-script
+TimeoutStartSec=0
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mfs-svc
+  namespace: mapr-cluster
+  labels:
+    env: mapr-cluster-node
+spec:
+  ports:
+  - port: 5660
+    name: mfs1
+  - port: 5692
+    name: mfs2
+  - port: 5724
+    name: mfs3
+  - port: 5756
+    name: mfs4
+  clusterIP: None
+  selector:
+    mfs: data

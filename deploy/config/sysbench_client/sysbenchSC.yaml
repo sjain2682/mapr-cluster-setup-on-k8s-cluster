@@ -1,0 +1,16 @@
+# Copyright (c) 2009 & onwards. MapR Tech, Inc., All rights reserved
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+   name: sysbench-storage
+   namespace: sysbench-tests
+provisioner: mapr.com/maprfs
+parameters:
+    restServers: "[change me:]"
+    cluster: "[cluster name]"
+    cldbHosts: "[cldb ips separated by space"
+    maprSecretName: "mapr-provisioner-secrets"
+    maprSecretNamespace: "sysbench-tests"
+    namePrefix: "sysbench"
+    mountPrefix: "/sysbench"
+    advisoryquota: "500G"
