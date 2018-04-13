@@ -39,7 +39,7 @@ setupLabels() {
      fi
      echo "Setting up the labels in K8S cluster nodes ..."
 
-     MAPR_NODES=(`kubectl get nodes |grep -vi master|grep -v NAME |awk '{print $1}' |head -$NO_OF_NODES` "${MAPR_NODES[@]}")
+     MAPR_NODES=(`kubectl get nodes |grep -v NAME |awk '{print $1}' |head -$NO_OF_NODES` "${MAPR_NODES[@]}")
      for i in $($SEQ $((${#MAPR_NODES[@]} - $NO_OF_RESERVE_NODES - 1)) $((${#MAPR_NODES[@]} - 1 -1)) )
      do
      	     MAPR_RESERVE_NODES[$COUNT]="${MAPR_NODES[$i]}"
