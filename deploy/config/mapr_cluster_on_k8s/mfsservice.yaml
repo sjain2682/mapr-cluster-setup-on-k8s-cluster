@@ -17,4 +17,4 @@ spec:
     name: mfs4
   clusterIP: None
   selector:
-    mfs: data
+    role: data

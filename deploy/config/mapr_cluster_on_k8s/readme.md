@@ -1,6 +1,6 @@
 To install mapr cluster:
 
-  1.  Run pre_setup_script/preMapRClusterSetup
+  1.  Run pre_setup_script/MapRNodeSetupOnK8S 
   2.  kubectl create -f maprclusternamespace.yaml
   3.  kubectl create -f maprclusterconfigmap.yaml
   4.  kubectl create -f maprusersecrets.yaml

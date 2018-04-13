@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: mfs-cm
+  name: mfs-cm1
   namespace: mapr-cluster
 data:
   mfs.conf: |
@@ -55,7 +55,10 @@ spec:
             name: mfs4
           env:
           - name : DISKARGS
-            value: "12"
+            valueFrom: 
+              configMapKeyRef:
+                name: mapr-cluster-configmap
+                key: MAPR_MFS_DISKARGS 
           - name : MFS_HEAP_SIZE
             value: "50000"
           - name : MAPR_MEMORY
@@ -165,10 +168,10 @@ spec:
           path: /sys/fs/cgroup
       - name: logs
         hostPath:
-          path: /root/k8s/mfs2/logs
+          path: /root/k8s/mfs1/logs
       - name: diskfile
         hostPath:
-          path: /tmp/podaa
+          path: /tmp/pod1
       - name: initfile
         hostPath:
           path: /tmp/mfsnodeinit

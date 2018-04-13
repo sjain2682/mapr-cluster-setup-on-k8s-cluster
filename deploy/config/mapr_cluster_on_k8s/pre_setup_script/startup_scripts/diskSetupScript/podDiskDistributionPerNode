@@ -6,7 +6,8 @@ exit 1
 fi
 rm -f /tmp/disklist.txt
 rm -f /tmp/pod*
-NUM_DISK_PER_POD=$1
+NUM_OF_POD_PER_NODE=$1
+NUM_DISK_PER_POD=""
 for i in `lsscsi|awk '{print $6}'`; 
 do 
 fdisk -l $i 2>&1|grep -i linux  >/dev/null
@@ -17,5 +18,12 @@ fi
 echo $i >>/tmp/disklist.txt;
 done
 TOTAL_AVAILABLE_DISKS=`cat /tmp/disklist.txt|wc -l`
-NUM_OF_POD_PER_NODE=$((TOTAL_AVAILABLE_DISKS/NUM_DISK_PER_POD))
+NUM_DISK_PER_POD=$((TOTAL_AVAILABLE_DISKS/NUM_OF_POD_PER_NODE))
 split -l $NUM_DISK_PER_POD /tmp/disklist.txt /tmp/pod
+
+j=1
+for i in `ls /tmp/pod*`
+do
+mv $i /tmp/pod$j
+j=`expr $j + 1`
+done

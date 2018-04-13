@@ -1,50 +1,96 @@
-apiVersion: v1
-kind: ConfigMap
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
 metadata:
-  name: mfs-cm2
+  name: cldb-pdb
   namespace: mapr-cluster
-data:
-  mfs.conf: |
-    mfs.server.port: 5660
-    mfs.numrpcthreads: 2
----
-apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  name: mapr-mfs2
-  namespace: mapr-cluster
-  labels:
-    role: data 
 spec:
   selector:
     matchLabels:
-      role: data
+      role: cldb
+  minAvailable: 1
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cldb-cm
+  namespace: mapr-cluster
+data:
+  cldb.conf: |
+    cldb.min.fileservers: 1
+    cldb.port: 7222
+    cldb.numthreads: 10
+    cldb.web.port: 7221
+    cldb.web.https.port: 7443
+    cldb.detect.dup.hostid.enabled: false
+    hadoop.version: 0.20.2
+    cldb.jmxremote.port: 7220
+    num.volmirror.threads: 1
+    enable.replicas.invariant.check: false
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: cldb
+  namespace: mapr-cluster
+spec:
+  serviceName: "cldb-svc"
+  replicas: 2
   template:
     metadata:
       labels:
-        role: data
+        role: cldb
     spec:
       tolerations:
       - key: node-role.kubernetes.io/master
         effect: NoSchedule
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: role
+                operator: In
+                values:
+                - cldb
+      volumes:
+      - name: run
+        emptyDir: {}
+      - name: runlock
+        emptyDir: {}
+      - name: cgroups
+        hostPath:
+          path: /sys/fs/cgroup
+      - name: logs
+        hostPath:
+          path: /root/k8s/cldb/logs
+      - name: diskfile
+        hostPath:
+          path: /tmp/podaa
+      - name: initfile
+        hostPath:
+          path: /tmp/cldbnodeinit
+      - name: backup
+        hostPath:
+          path: /tmp/cldb_podbackup
       containers:
-        - name: mapr-mfs2
+        - name: cldb
           imagePullPolicy: Always
-          image: docker.artifactory/maprtech/mfs:6.0.0_4.0.0_centos7
+          image: docker.artifactory/maprtech/cldb:6.0.0_4.0.0_centos7
           securityContext:
             privileged: true
             capabilities:
               add: ["SYS_ADMIN" , "NET_ADMIN", "NET_BROADCAST", "SYS_PACCT", "SYS_NICE", "SYS_RESOURCE", "SYS_RAWIO", "IPC_LOCK", "SYSLOG", "SYS_TIME"]
-          command: ["/bin/bash","-c","/tmp/mfsnodeinit"]
-          lifecycle:
-            preStop:
-              exec:
-                command: ["bash", "-c", "/opt/mapr/plugin/pre-stop"]
           resources:
             requests:
-              memory: "65Gi"
-              cpu: "5"
+              memory: "100Gi"
+              cpu: "8"
           ports:
+          - containerPort: 7222
+            name: server
+          - containerPort: 7221
+            name: web
+          - containerPort: 3888
+            name: jmx
           - containerPort: 5660
             name: mfs1
           - containerPort: 5692
@@ -55,92 +101,88 @@ spec:
             name: mfs4
           env:
           - name : DISKARGS
-            valueFrom: 
-              configMapKeyRef:
-                name: mapr-cluster-configmap
-                key: MAPR_MFS_DISKARGS 
-          - name : MFS_HEAP_SIZE
-            value: "50000"
-          - name : MAPR_MEMORY
+            value: "12"
+          - name: MAPR_MEMORY
             valueFrom:
               resourceFieldRef:
-                containerName: mapr-mfs2
+                containerName: cldb
                 resource: requests.memory
-          - name : MAPR_CLUSTER
+          - name: MAPR_CLUSTER
             valueFrom:
               configMapKeyRef:
                 name: mapr-cluster-configmap
                 key: MAPR_CLUSTER
-          - name : MAPR_CLDB_HOSTS
+          - name: MAPR_CLDB_HOSTS
             valueFrom:
               configMapKeyRef:
                 name: mapr-cluster-configmap
                 key: MAPR_CLDB_HOSTS
-          - name : MAPR_ZK_HOSTS
+          - name: MAPR_ZK_HOSTS
             valueFrom:
               configMapKeyRef:
                 name: mapr-cluster-configmap
                 key: MAPR_ZK_HOSTS
-          - name : MAPR_HS_HOST
+          - name: MAPR_HS_HOST
             valueFrom:
               configMapKeyRef:
                 name: mapr-cluster-configmap
                 key: MAPR_HS_HOST
-          - name : MAPR_OT_HOSTS
+          - name: MAPR_OT_HOSTS
             valueFrom:
               configMapKeyRef:
                 name: mapr-cluster-configmap
                 key: MAPR_OT_HOSTS
-          - name : MAPR_DB
+          - name: MAPR_DB
             valueFrom:
               configMapKeyRef:
                 name: mapr-cluster-configmap
                 key: MAPR_DB
-          - name : MAPR_TZ
+          - name: MAPR_TZ
             valueFrom:
               configMapKeyRef:
                 name: mapr-cluster-configmap
                 key: MAPR_TZ
-          - name : MAPR_HOME
+          - name: MAPR_HOME
             valueFrom:
               configMapKeyRef:
                 name: mapr-cluster-configmap
                 key: MAPR_HOME
-          - name : MAPR_PORT
+          - name: MAPR_PORT
             valueFrom:
               configMapKeyRef:
                 name: mapr-cluster-configmap
                 key: MAPR_PORT
-          - name : MAPR_USER
+          - name: MAPR_USER
             valueFrom:
               secretKeyRef:
                 name: mapr-user-secrets
                 key: MAPR_USER
-          - name : MAPR_GROUP
+          - name: MAPR_GROUP
             valueFrom:
               secretKeyRef:
                 name: mapr-user-secrets
                 key: MAPR_GROUP
-          - name : MAPR_UID
+          - name: MAPR_UID
             valueFrom:
               secretKeyRef:
                 name: mapr-user-secrets
                 key: MAPR_UID
-          - name : MAPR_GID
+          - name: MAPR_GID
             valueFrom:
               secretKeyRef:
                 name: mapr-user-secrets
                 key: MAPR_GID
-          - name : MAPR_PASSWORD
+          - name: MAPR_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: mapr-user-secrets
                 key: MAPR_PASSWORD
-          - name : MAPR_ROOT_PASSWORD
+          - name: MAPR_ROOT_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: mapr-user-secrets
                 key: MAPR_ROOT_PASSWORD
+          command: ["/bin/bash","-c","/tmp/cldbnodeinit"]
           volumeMounts:
           - mountPath: /run
             name: run
@@ -153,31 +195,9 @@ spec:
             name: logs
           - mountPath: /tmp/diskfile.txt
             name: diskfile
-          - mountPath: /tmp/mfsnodeinit
+          - mountPath: /tmp/cldbnodeinit
             name: initfile
           - mountPath: /tmp/backup
             name: backup
-      terminationGracePeriodSeconds: 30
-      volumes:
-      - name: run
-        emptyDir: {}
-      - name: runlock
-        emptyDir: {}
-      - name: cgroups
-        hostPath:
-          path: /sys/fs/cgroup
-      - name: logs
-        hostPath:
-          path: /root/k8s/mfs2/logs
-      - name: diskfile
-        hostPath:
-          path: /tmp/pod2
-      - name: initfile
-        hostPath:
-          path: /tmp/mfsnodeinit
-      - name: backup
-        hostPath:
-          path: /tmp/mfs2_podbackup
       nodeSelector:
         env: mapr-cluster-node
-        role: data
