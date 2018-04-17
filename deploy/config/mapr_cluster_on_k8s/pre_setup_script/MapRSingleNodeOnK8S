@@ -1,0 +1,155 @@
+#!/bin/bash
+set -x
+SEQ=/usr/bin/seq
+
+#OUT MSG
+bold=$(tput bold)
+normal=$(tput sgr0)
+
+setupLabels() {
+
+     COUNT=0
+     echo "Setting up the labels in K8S cluster nodes ..."
+
+     MAPR_NODES=(`kubectl get nodes |grep -v NAME |awk '{print $1}'` "${MAPR_NODES[@]}")
+
+     #Add labels for mapr nodes
+     #echo "MAPR_ALL_NODES"
+     for i in $($SEQ 0 $((${#MAPR_NODES[@]} - 2)))
+     do
+	     kubectl label node ${MAPR_NODES[$i]} env=mapr-cluster-node --overwrite 2>&1  >/dev/null
+	     #echo ${MAPR_NODES[$i]}
+	     kubectl label node ${MAPR_NODES[$i]} role=all --overwrite 2>&1  >/dev/null
+     done
+
+     echo "labels are setup successfully in K8S cluster nodes"
+}
+
+addDiskForPod() {
+
+     echo "Starting disk distribution for pods ..."
+
+     for i in `kubectl get nodes --show-labels |grep -i role|awk '{print $1}'|grep -v NAME`
+       do
+        scp -p ./startup_scripts/diskSetupScript/podDiskDistributionPerNode $i:/tmp 2>&1 >/dev/null
+        ssh $i /tmp/podDiskDistributionPerNode 1 2>&1 >/dev/null
+       done
+
+     echo "Successfully disk distributed for pods"
+}
+
+
+copyInitAndServicesFiles() {
+     echo "copying init services files for mapr cluster pods ..."
+
+     for i in `kubectl get nodes --show-labels |grep -i role|awk '{print $1}'|grep -v NAME`
+      do
+	
+         ssh $i mkdir -p /tmp/cldb_podbackup 2>&1 >/dev/null
+         ssh $i mkdir -p /tmp/web_podbackup 2>&1 >/dev/null
+         ssh $i mkdir -p /tmp/zoo_podbackup 2>&1 >/dev/null
+
+         scp -p ./startup_scripts/mfsnodeinit $i:/tmp 2>&1 >/dev/null
+         scp -p ./startup_scripts/cldbnodeinit $i:/tmp 2>&1 >/dev/null
+	 scp -p ./startup_scripts/webnodeinit $i:/tmp 2>&1 >/dev/null
+
+         scp -p ./startup_scripts/cldb-init-script $i:/tmp/cldb_podbackup 2>&1 >/dev/null
+         scp -p ./startup_scripts/web-init-script $i:/tmp/web_podbackup 2>&1 >/dev/null
+	
+	 scp -p ./startup_scripts/container_init_services/web.service $i:/tmp/web_podbackup 2>&1 >/dev/null
+	 scp -p ./startup_scripts/container_init_services/cldb.service $i:/tmp/cldb_podbackup 2>&1 >/dev/null
+
+      done
+     echo "successfully copied all services files for mapr cluster pods"
+}
+
+removeConfDirectoryFromBackupBeforeStart() {
+     echo "cleaning up the old files ..."
+     for i in `kubectl get nodes --show-labels |grep -i role|awk '{print $1}'|grep -v NAME`
+       do
+	 ssh $i rm -rf /tmp/cldb_podbackup/conf 2>&1 >/dev/null
+	 ssh $i rm -rf /tmp/web_podbackup/conf 2>&1 >/dev/null
+	 ssh $i rm -rf /tmp/zoo_podbackup/conf 2>&1 >/dev/null
+      done
+     echo "Successfully cleanup up the old files"
+}
+
+generateConfigMapWithClusterName() {
+     echo "generating config map file ..."
+     #Remove older mfs yaml files from the parent folder
+     rm -f ./../singleNodeSetup/maprclusterconfigmap.yaml
+
+	sed -e "s/MAPR_CLUSTER: \"archerx\"/MAPR_CLUSTER: \"$1\"/g" ../conf/maprclusterconfigmap.yaml >./../singleNodeSetup/maprclusterconfigmap.yaml 2>&1
+
+       if [ ! -z $2 ]
+        then
+         sed -i "s/MAPR_MFS_DISKARGS: \"3\"/MAPR_MFS_DISKARGS: \"$2\"/g" ./../singleNodeSetup/maprclusterconfigmap.yaml 2>&1
+        fi
+     echo "Successfully generated config map file"
+}
+
+generateZooKeeperYamlFile() {
+     echo "generating zk yaml file ..."
+     #Remove older zk yaml files from the parent folder
+     rm -f ./../singleNodeSetup/zk.yaml
+
+     sed -e "s/role: zk/role: all/g" ../conf/zk.yaml >./../singleNodeSetup/zk.yaml
+     sed -i "s/\- zk/\- all/g" ./../singleNodeSetup/zk.yaml
+     echo "Successfully generated zk yaml file ..."
+}
+
+generateCldbYamlFile() {
+
+     echo "generating cldb yaml file ..."
+
+     #Remove older cldb yaml files from the parent folder
+     rm -f ./../singleNodeSetup/cldb.yaml
+
+     sed -e "s/role: cldb/role: all/g" ../conf/cldb.yaml >./../singleNodeSetup/cldb.yaml
+     sed -i "s/\- cldb/\- all/g" ./../singleNodeSetup/cldb.yaml
+
+     echo "Successfully generated cldb yaml file ..."
+}
+
+generateWebYamlFile() {
+     echo "generating web yaml file ..."
+     #Remove older mfs yaml files from the parent folder
+     rm -f ./../singleNodeSetup/web.yaml
+     sed -e "s/role: web/role: all/g" ../conf/web.yaml >./../singleNodeSetup/web.yaml
+     sed -i "s/\- web/\- all/g" ./../singleNodeSetup/web.yaml
+     echo "Successfully generated web yaml file ..."
+}
+
+generateCldbServiceYamlFile() {
+    echo "Generating cldbservice yaml file ..."
+    rm -f ./../singleNodeSetup/cldbservice.yaml
+    sed -e "s/role: cldb/role: all/g" ../conf/cldbservice.yaml > ./../singleNodeSetup/cldbservice.yaml
+    echo "Successfully generated cldbservice yaml file ..."
+}
+
+generateZookeeperServiceYamlFile() {
+    echo "Generating cldbservice yaml file ..."
+    rm -f ./../singleNodeSetup/zkservice.yaml
+    sed -e "s/role: zk/role: all/g" ../conf/zkservice.yaml > ./../singleNodeSetup/zkservice.yaml
+    echo "Successfully generated zkservice yaml file ..."
+}
+    
+
+if [ $# -lt 1 ]
+  then
+   echo "${bold}Usage: MapRSingleNodeOnK8S  <MAPR CLUSTER NAME> \
+  <DISK_WIDTH>${normal}"
+   exit 1;
+fi
+
+
+setupLabels
+addDiskForPod
+copyInitAndServicesFiles
+removeConfDirectoryFromBackupBeforeStart
+generateConfigMapWithClusterName $1 $2
+generateZooKeeperYamlFile
+generateCldbYamlFile
+generateWebYamlFile
+generateCldbServiceYamlFile
+generateZookeeperServiceYamlFile

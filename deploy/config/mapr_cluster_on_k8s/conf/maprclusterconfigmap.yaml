@@ -5,7 +5,7 @@ metadata:
   namespace: mapr-cluster
 data:
   MAPR_CLUSTER: "archerx"
-  MAPR_CLDB_HOSTS: "cldb-0.cldb-svc.mapr-cluster.svc.cluster.local,cldb-1.cldb-svc.mapr-cluster.svc.cluster.local"
+  MAPR_CLDB_HOSTS: "cldb-0.cldb-svc.mapr-cluster.svc.cluster.local"
   MAPR_ZK_HOSTS: "zk-0.zk-svc.mapr-cluster.svc.cluster.local"
   MAPR_HS_HOST: ""
   MAPR_OT_HOSTS: ""

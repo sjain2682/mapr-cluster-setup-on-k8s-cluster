@@ -4,7 +4,7 @@ metadata:
   name: mapr-cluster-configmap
   namespace: mapr-cluster
 data:
-  MAPR_CLUSTER: "maprOnPods"
+  MAPR_CLUSTER: "QA1"
   MAPR_CLDB_HOSTS: "cldb-0.cldb-svc.mapr-cluster.svc.cluster.local"
   MAPR_ZK_HOSTS: "zk-0.zk-svc.mapr-cluster.svc.cluster.local"
   MAPR_HS_HOST: ""

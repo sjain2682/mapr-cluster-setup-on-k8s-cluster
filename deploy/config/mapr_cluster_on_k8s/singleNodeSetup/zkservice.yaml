@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: zk-svc
+  namespace: mapr-cluster
+  labels:
+    env: mapr-cluster-node
+spec:
+  ports:
+  - name: lclient
+    port: 5181
+  - name: server
+    port: 2888
+  - name: leader-election
+    port: 3888
+  clusterIP: None
+  selector:
+    role: all

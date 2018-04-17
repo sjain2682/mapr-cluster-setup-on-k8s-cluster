@@ -34,7 +34,7 @@ metadata:
   namespace: mapr-cluster
 spec:
   serviceName: "cldb-svc"
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:

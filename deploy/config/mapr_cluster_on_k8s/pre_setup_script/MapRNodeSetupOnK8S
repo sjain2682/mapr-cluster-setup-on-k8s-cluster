@@ -156,9 +156,9 @@ removeConfDirectoryFromBackupBeforeStart() {
 generateZooKeeperYamlFile() {
      echo "generating zk yaml file ..."
      #Remove older zk yaml files from the parent folder
-     rm -f ./../zk.yaml
+     rm -f ./../MultiNodeSetup/zk.yaml
 
-     sed -e "s/replicas: 1/replicas: $1/g" ../conf/zk.yaml >./../zk.yaml 
+     sed -e "s/replicas: 1/replicas: $1/g" ../conf/zk.yaml >./../MultiNodeSetup/zk.yaml 
      echo "Successfully generated zk yaml file ..."
 }
 
@@ -167,9 +167,9 @@ generateCldbYamlFile() {
      echo "generating cldb yaml file ..."
 
      #Remove older cldb yaml files from the parent folder
-     rm -f ./../cldb.yaml
+     rm -f ./../MultiNodeSetup/cldb.yaml
 
-     sed -e "s/replicas: 2/replicas: $1/g" ../conf/cldb.yaml >./../cldb.yaml 
+     sed -e "s/replicas: 1/replicas: $1/g" ../conf/cldb.yaml >./../MultiNodeSetup/cldb.yaml 
 
      echo "Successfully generated cldb yaml file ..."
 }
@@ -177,11 +177,11 @@ generateCldbYamlFile() {
 generateWebYamlFile() {
      echo "generating web yaml file ..."
      #Remove older mfs yaml files from the parent folder
-     rm -f ./../web.yaml
+     rm -f ./../MultiNodeSetup/web.yaml
 
      if [ ! -z $1 ]
        then
-        sed -e "s/replicas: 1/replicas: $1/g" ../conf/web.yaml >./../web.yaml
+        sed -e "s/replicas: 1/replicas: $1/g" ../conf/web.yaml >./../MultiNodeSetup/web.yaml
        fi
      echo "Successfully generated web yaml file ..."
 }
@@ -195,7 +195,7 @@ generateConfigMapWithClusterName() {
      #Remove older mfs yaml files from the parent folder
      rm -f ./../maprclusterconfigmap.yaml
 
-	sed -e "s/MAPR_CLUSTER: \"archerx\"/MAPR_CLUSTER: \"$1\"/g" ../conf/maprclusterconfigmap.yaml >./../maprclusterconfigmap.yaml 2>&1
+	sed -e "s/MAPR_CLUSTER: \"archerx\"/MAPR_CLUSTER: \"$1\"/g" ../conf/maprclusterconfigmap.yaml >./../MultiNodeSetup/maprclusterconfigmap.yaml 2>&1
 	for (( i = 0; i < $2; i++ ))
          do 
              if [  -z $CLDB_NODES ]; 
@@ -216,11 +216,11 @@ generateConfigMapWithClusterName() {
 	     fi
 	done
 
-	sed -i "s/MAPR_CLDB_HOSTS: \"cldb-0.cldb-svc.mapr-cluster.svc.cluster.local,cldb-1.cldb-svc.mapr-cluster.svc.cluster.local\"/MAPR_CLDB_HOSTS: \"$CLDB_NODES\"/g" ./../maprclusterconfigmap.yaml 2>&1
-       sed -i "s/MAPR_ZK_HOSTS: \"zk-0.zk-svc.mapr-cluster.svc.cluster.local\"/MAPR_ZK_HOSTS: \"$ZK_NODES\"/g" ./../maprclusterconfigmap.yaml 2>&1 
+	sed -i "s/MAPR_CLDB_HOSTS: \"cldb-0.cldb-svc.mapr-cluster.svc.cluster.local\"/MAPR_CLDB_HOSTS: \"$CLDB_NODES\"/g" ./../MultiNodeSetup/maprclusterconfigmap.yaml 2>&1
+       sed -i "s/MAPR_ZK_HOSTS: \"zk-0.zk-svc.mapr-cluster.svc.cluster.local\"/MAPR_ZK_HOSTS: \"$ZK_NODES\"/g" ./../MultiNodeSetup/maprclusterconfigmap.yaml 2>&1 
        if [ ! -z $4 ]
         then
-         sed -i "s/MAPR_MFS_DISKARGS: \"3\"/MAPR_MFS_DISKARGS: \"$4\"/g" ./../maprclusterconfigmap.yaml 2>&1
+         sed -i "s/MAPR_MFS_DISKARGS: \"3\"/MAPR_MFS_DISKARGS: \"$4\"/g" ./../MultiNodeSetup/maprclusterconfigmap.yaml 2>&1
         fi
      echo "Successfully generated config map file"
 }
@@ -229,16 +229,16 @@ generateMfsYamlFile() {
  
      echo "generating mfs yaml files ..."
      #Remove older mfs yaml files from the parent folder
-     rm -f ./../mfs*yaml
+     rm -f ./../MultiNodeSetup/mfs*yaml
 
      for (( i = 1; i <= $1; i++ ))
       do
-       sed -e "s/name: mfs-cm/name: mfs-cm$i/g" ../conf/mfs1.yaml >./../mfs$i.yaml 2>&1
-       sed -i "s/name: mapr-mfs1/name: mapr-mfs$i/g" ./../mfs$i.yaml 2>&1
-       sed -i "s/containerName: mapr-mfs1/containerName: mapr-mfs$i/g" ./../mfs$i.yaml 2>&1
-       sed -i "s/path: \/root\/k8s\/mfs1\/logs/path: \/root\/k8s\/mfs$i\/logs/g" ./../mfs$i.yaml 2>&1
-       sed -i "s/path: \/tmp\/mfs1_podbackup/path: \/tmp\/mfs"$i"_podbackup/g" ./../mfs$i.yaml 2>&1
-       sed -i "s/path: \/tmp\/pod1/path: \/tmp\/pod$i/g" ./../mfs$i.yaml 2>&1
+       sed -e "s/name: mfs-cm/name: mfs-cm$i/g" ../conf/mfs1.yaml >./../MultiNodeSetup/mfs$i.yaml 2>&1
+       sed -i "s/name: mapr-mfs1/name: mapr-mfs$i/g" ./../MultiNodeSetup/mfs$i.yaml 2>&1
+       sed -i "s/containerName: mapr-mfs1/containerName: mapr-mfs$i/g" ./../MultiNodeSetup/mfs$i.yaml 2>&1
+       sed -i "s/path: \/root\/k8s\/mfs1\/logs/path: \/root\/k8s\/mfs$i\/logs/g" ./../MultiNodeSetup/mfs$i.yaml 2>&1
+       sed -i "s/path: \/tmp\/mfs1_podbackup/path: \/tmp\/mfs"$i"_podbackup/g" ./../MultiNodeSetup/mfs$i.yaml 2>&1
+       sed -i "s/path: \/tmp\/pod1/path: \/tmp\/pod$i/g" ./../MultiNodeSetup/mfs$i.yaml 2>&1
       done
      echo "Successfully generated mfs yaml files"
 }
