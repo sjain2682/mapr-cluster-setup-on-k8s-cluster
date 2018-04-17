@@ -6,12 +6,12 @@ Kubernetes cluster is installed and running on bare metal
 Objective: Run sysbnech tests for mapr cluster on K8S cluster
 
 
-Here are the steps which were followed:
-----------------------------------------
-A) Setup a mapr cluster having multiples nodes as pods
-B) Deploy the MapR volume plugin on K8S cluster
-C) Setup a sysbench tests where each sysbench pods is using mapr vol plugin for persistent volumes 
-D) Run sysbench fileio tests on pod persistent volume which is sitting on mapr
+Blow are the steps to follow:
+-----------------------------
+A. Setup a mapr cluster having multiples nodes as pods
+B. Deploy the MapR volume plugin on K8S cluster
+C. Setup a sysbench tests where each sysbench pods is using mapr vol plugin for persistent volumes 
+D. Run sysbench fileio tests on pod persistent volume which is sitting on mapr
 
 
    A) Setup MapR cluster :
