@@ -55,7 +55,7 @@ D. Run sysbench fileio tests on pod persistent volume which is sitting on mapr
   	11. Wait for three to five minutes for cldb to come up 
 
 
-     B) Deploy MapR Vol Plugin :
+    B) Deploy MapR Vol Plugin :
 
 	To install plugin and provisioner:
         ----------------------------------
@@ -67,7 +67,7 @@ D. Run sysbench fileio tests on pod persistent volume which is sitting on mapr
 	Note: These setup will not work with single node K8S cluster
 
 
-      C & D) Setup and Start sysbench tests:
+    C & D) Setup and Start sysbench tests:
 
 	To install and start sysbench tests:
 	-----------------------------------
