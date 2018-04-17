@@ -65,7 +65,7 @@ spec:
           path: /root/k8s/cldb/logs
       - name: diskfile
         hostPath:
-          path: /tmp/podaa
+          path: /tmp/pod1
       - name: initfile
         hostPath:
           path: /tmp/cldbnodeinit
@@ -101,7 +101,10 @@ spec:
             name: mfs4
           env:
           - name : DISKARGS
-            value: "12"
+            valueFrom:
+              configMapKeyRef:
+                name: mapr-cluster-configmap
+                key: MAPR_MFS_DISKARGS
           - name: MAPR_MEMORY
             valueFrom:
               resourceFieldRef:

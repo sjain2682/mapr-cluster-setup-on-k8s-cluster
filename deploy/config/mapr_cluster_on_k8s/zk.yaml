@@ -30,14 +30,17 @@ metadata:
   namespace: mapr-cluster
 spec:
   serviceName: "zk-svc"
-  replicas: 5
+  replicas: 1
   template:
     metadata:
       labels:
         role: zk
     spec:
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
       affinity:
-        podAntiAffinity:
+        podAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:

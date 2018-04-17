@@ -4,9 +4,9 @@ metadata:
   name: mapr-cluster-configmap
   namespace: mapr-cluster
 data:
-  MAPR_CLUSTER: "QA1"
-  MAPR_CLDB_HOSTS: "cldb-0.cldb-svc.mapr-cluster.svc.cluster.local,cldb-1.cldb-svc.mapr-cluster.svc.cluster.local,cldb-2.cldb-svc.mapr-cluster.svc.cluster.local,cldb-3.cldb-svc.mapr-cluster.svc.cluster.local,cldb-4.cldb-svc.mapr-cluster.svc.cluster.local"
-  MAPR_ZK_HOSTS: "zk-0.zk-svc.mapr-cluster.svc.cluster.local,zk-1.zk-svc.mapr-cluster.svc.cluster.local,zk-2.zk-svc.mapr-cluster.svc.cluster.local,zk-3.zk-svc.mapr-cluster.svc.cluster.local,zk-4.zk-svc.mapr-cluster.svc.cluster.local"
+  MAPR_CLUSTER: "maprOnPods"
+  MAPR_CLDB_HOSTS: "cldb-0.cldb-svc.mapr-cluster.svc.cluster.local"
+  MAPR_ZK_HOSTS: "zk-0.zk-svc.mapr-cluster.svc.cluster.local"
   MAPR_HS_HOST: ""
   MAPR_OT_HOSTS: ""
   MAPR_DB: "true"
@@ -14,4 +14,4 @@ data:
   MAPR_TZ: "UTC"
   MAPR_HOME: "/opt/mapr"
   MAPR_PORT: "9443"
-  MAPR_MFS_DISKARGS: "5"
+  MAPR_MFS_DISKARGS: "3"

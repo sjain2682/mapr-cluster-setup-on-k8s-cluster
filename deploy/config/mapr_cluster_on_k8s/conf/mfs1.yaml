@@ -171,7 +171,7 @@ spec:
           path: /root/k8s/mfs1/logs
       - name: diskfile
         hostPath:
-          path: /tmp/podaa
+          path: /tmp/pod1
       - name: initfile
         hostPath:
           path: /tmp/mfsnodeinit
