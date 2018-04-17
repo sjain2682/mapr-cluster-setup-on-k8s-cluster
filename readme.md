@@ -5,7 +5,7 @@ Kubernetes cluster is installed and running on bare metal
 
 
 
-Setup docker registery: 
+Setup docker registry: 
 -----------------------
 Add below entries in /etc/docker/daemon.json
 {
@@ -16,6 +16,8 @@ Add below entries in /etc/docker/daemon.json
 
 
 Objective: Run sysbnech tests for mapr cluster on K8S cluster
+
+
 
 
 Below are the steps to follow:
