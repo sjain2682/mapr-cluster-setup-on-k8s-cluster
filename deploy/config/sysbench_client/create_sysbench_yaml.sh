@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+rm -f ./sysbench_multipods/sysbench_*.yaml
 for i in {1..40} 
 do
 sed -e s/test-simple/test-simple-$i/g sysbench.yaml >./sysbench_multipods/sysbench_$i.yaml 2>&1
