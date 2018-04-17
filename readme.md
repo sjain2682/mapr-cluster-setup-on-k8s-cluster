@@ -55,8 +55,8 @@ D. Run sysbench fileio tests on pod persistent volume which is sitting on mapr
   	13. #If multiple mfs pod per nodes then run kubectl create -f mfs<no>.yaml multiple times
   	14. kubectl create -f web.yaml
 
-	To install mapr single nodes/pods cluster:
-	------------------------------------------
+	To install mapr single nodes/pods cluster in single node K8S cluster:
+	--------------------------------------------------------------------
   	1.  Run cd deploy/config/mapr_cluster_on_k8s/pre_setup_script; ./MapRSingleNodeOnK8S
       	    example: ./MapRSingleNodeOnK8S maprOnPods 3
   	2.  Go to mapr_cluster_on_k8s directory/singleNodeSetup; cd deploy/config/mapr_cluster_on_k8s/singleNodeSetup;

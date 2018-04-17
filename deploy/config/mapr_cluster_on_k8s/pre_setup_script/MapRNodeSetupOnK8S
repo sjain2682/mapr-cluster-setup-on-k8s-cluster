@@ -120,12 +120,14 @@ copyInitAndServicesFiles() {
 	 for (( j = 1; j <= $1; j++ ))
           do  
             ssh $i mkdir -p /tmp/mfs"$j"_podbackup
+            ssh $i mkdir -p /root/k8s/mfs$j/logs 
             scp -p ./startup_scripts/mfs-init-script $i:/tmp/mfs"$j"_podbackup 2>&1 >/dev/null
 	    scp -p ./startup_scripts/container_init_services/mfs.service $i:/tmp/mfs"$j"_podbackup 2>&1 >/dev/null
           done
 
          ssh $i mkdir -p /tmp/cldb_podbackup 2>&1 >/dev/null
          ssh $i mkdir -p /tmp/web_podbackup 2>&1 >/dev/null
+         ssh $i mkdir -p /root/k8s/cldb/logs 2>&1 >/dev/null
 
          scp -p ./startup_scripts/mfsnodeinit $i:/tmp 2>&1 >/dev/null
          scp -p ./startup_scripts/cldbnodeinit $i:/tmp 2>&1 >/dev/null
@@ -239,6 +241,7 @@ generateMfsYamlFile() {
        sed -i "s/path: \/root\/k8s\/mfs1\/logs/path: \/root\/k8s\/mfs$i\/logs/g" ./../MultiNodeSetup/mfs$i.yaml 2>&1
        sed -i "s/path: \/tmp\/mfs1_podbackup/path: \/tmp\/mfs"$i"_podbackup/g" ./../MultiNodeSetup/mfs$i.yaml 2>&1
        sed -i "s/path: \/tmp\/pod1/path: \/tmp\/pod$i/g" ./../MultiNodeSetup/mfs$i.yaml 2>&1
+       sed -i "s/path: \/root\/k8s\/mfs1\/logs/path: \/root\/k8s\/mfs$i\/logs/g" ./../MultiNodeSetup/mfs$i.yaml 2>&1
       done
      echo "Successfully generated mfs yaml files"
 }
