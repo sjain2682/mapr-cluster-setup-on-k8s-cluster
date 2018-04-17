@@ -6,11 +6,14 @@ Kubernetes cluster is installed and running on bare metal
 Objective: Run sysbnech tests for mapr cluster on K8S cluster
 
 
-Blow are the steps to follow:
+Below are the steps to follow:
 -----------------------------
 A. Setup a mapr cluster having multiples nodes as pods
+
 B. Deploy the MapR volume plugin on K8S cluster
+
 C. Setup a sysbench tests where each sysbench pods is using mapr vol plugin for persistent volumes 
+
 D. Run sysbench fileio tests on pod persistent volume which is sitting on mapr
 
 
@@ -19,7 +22,7 @@ D. Run sysbench fileio tests on pod persistent volume which is sitting on mapr
 	To install mapr multi nodes/pods cluster:
 	-----------------------------------------
   	1.  Run cd deploy/config/mapr_cluster_on_k8s/pre_setup_script; ./MapRNodeSetupOnK8S 
-      		example: ./MapRNodeSetupOnK8S 4 1 1 1 1 1 maprOnPods 3
+      	    example: ./MapRNodeSetupOnK8S 4 1 1 1 1 1 maprOnPods 3
   	2.  Go to mapr_cluster_on_k8s directory; cd deploy/config/mapr_cluster_on_k8s
   	3.  kubectl create -f maprclusternamespace.yaml
   	4.  kubectl create -f maprclusterconfigmap.yaml
@@ -37,7 +40,7 @@ D. Run sysbench fileio tests on pod persistent volume which is sitting on mapr
 	To install mapr single nodes/pods cluster:
 	------------------------------------------
   	1.  Run cd deploy/config/mapr_cluster_on_k8s/pre_setup_script; ./MapRSingleNodeOnK8S
-      		example: ./MapRSingleNodeOnK8S maprOnPods 3
+      	    example: ./MapRSingleNodeOnK8S maprOnPods 3
   	2.  Go to mapr_cluster_on_k8s directory/singleNodeSetup; cd deploy/config/mapr_cluster_on_k8s/singleNodeSetup;
   	3.  kubectl create -f maprclusternamespace.yaml
   	4.  kubectl create -f maprclusterconfigmap.yaml
