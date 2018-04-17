@@ -8,6 +8,7 @@ Kubernetes cluster is installed and running on bare metal
 Setup docker registry: 
 -----------------------
 Add below entries in /etc/docker/daemon.json
+
 {
   "insecure-registries" : ["docker.artifactory"]
 }
@@ -15,8 +16,9 @@ Add below entries in /etc/docker/daemon.json
 
 
 
-Objective: Run sysbnech tests for mapr cluster on K8S cluster
-
+Objective: 
+----------
+Run sysbnech tests for mapr cluster on K8S cluster
 
 
 
