@@ -28,10 +28,6 @@ setupLabels() {
      	<no of cldb nodes> \
      	<no of data nodes>"
         exit 1;
-     elif [[ ($NO_OF_NODES -eq $NO_OF_RESERVE_NODES) || ($NO_OF_NODES -lt $NO_OF_RESERVE_NODES) ]]
-        then
-	     echo "No of webserver node can't be equal or greater then total number of nodes"
-	     exit 1;
      elif [[ (($NO_OF_NODES -lt $NO_OF_CLDB_DATA_RESERVE_NODES)) ]]
         then
 	     echo "Total number of nodes should be higher than no of nodes for cldb and data"
