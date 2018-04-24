@@ -94,7 +94,7 @@ setupLabels() {
 	     #echo $rc
      done
 
-     echo "labels are setup successfully in K8S cluster nodes"
+     echo "Successfully setup label in K8S cluster nodes"
 }
 
 addDiskForPod() {
@@ -107,7 +107,7 @@ addDiskForPod() {
         ssh $i /tmp/podDiskDistributionPerNode $1 2>&1 >/dev/null
        done
 
-     echo "Successfully disk distributed for pods"
+     echo "Successfully distributed disk for pods"
 }
 
 
