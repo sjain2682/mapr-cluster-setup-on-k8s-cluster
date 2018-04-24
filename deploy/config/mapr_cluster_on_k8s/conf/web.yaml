@@ -4,7 +4,7 @@ metadata:
   name: web-svc
   namespace: mapr-cluster
   labels:
-    role: data
+    app: web
 spec:
   ports:
   - protocol: TCP
@@ -14,7 +14,7 @@ spec:
     nodePort: 30061
   type: NodePort
   selector:
-    role: data
+    app: web
 ---
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
@@ -24,7 +24,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      role: data
+      app: web
   minAvailable: 1
 ---
 apiVersion: v1
@@ -50,7 +50,7 @@ spec:
   template:
     metadata:
       labels:
-        role: data
+        app: web
     spec:
       tolerations:
       - key: node-role.kubernetes.io/master
@@ -60,10 +60,10 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:
-              - key: "role"
+              - key: "app"
                 operator: In
                 values:
-                - data
+                - web
             topologyKey: "kubernetes.io/hostname"
       containers:
         - name: web
@@ -185,7 +185,7 @@ spec:
             name: backup
       nodeSelector:
         env: mapr-cluster-node
-        role: data
+        app: web
       volumes:
       - name: run
         emptyDir: {}
