@@ -64,14 +64,12 @@ setupLabels() {
 
      #Add "MAPR_WEB_NODES" nodes
      wc=0
-set -x;
      for i in $($SEQ 0 $((NO_OF_WEB_NODES - 1)))
      do
 	     #echo ${MAPR_NODES[$i]}
 	     kubectl label node ${MAPR_NODES[$i]} ui=web --overwrite >/dev/null 2>&1
 	     #dc=$((dc + 1))
      done
-set +x
 
 
      #Add labels for zookeeper node 
@@ -82,7 +80,6 @@ set +x
 	     kubectl label node ${MAPR_NODES[$i]} app=zk --overwrite >/dev/null 2>&1
 	     #rc=$((rc + 1))
      done
-     kubectl label node perf109-35.qa.lab role=nouse --overwrite
      echo "Successfully setup label in K8S cluster nodes"
 }
 
