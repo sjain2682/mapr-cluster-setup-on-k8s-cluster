@@ -15,4 +15,4 @@ spec:
     port: 3888
   clusterIP: None
   selector:
-    role: data
+    app: zk
