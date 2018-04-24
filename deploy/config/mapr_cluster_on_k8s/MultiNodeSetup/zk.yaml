@@ -40,15 +40,14 @@ spec:
       - key: node-role.kubernetes.io/master
         effect: NoSchedule
       affinity:
-        podAffinity:
+        nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: "app"
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: app
                 operator: In
                 values:
                 - zk
-            topologyKey: "kubernetes.io/hostname"
       containers:
       - name: zk
         imagePullPolicy: Always
@@ -177,6 +176,7 @@ spec:
           name: backup
       nodeSelector:
         env: mapr-cluster-node
+        app: zk
       volumes:
       - name: run
         emptyDir: {}
