@@ -1,6 +1,7 @@
 Assumption: 
 ---------------------------------
 Kubernetes cluster is installed and running on bare metal
+Nodes are setup with password less SSH between all K8S nodes
 
 
 
@@ -41,7 +42,7 @@ D. Run sysbench fileio tests on pod persistent volume which is sitting on mapr
 	-----------------------------------------
   	1.  Run cd deploy/config/mapr_cluster_on_k8s/pre_setup_script; ./MapRNodeSetupOnK8S 
       	    example: ./MapRNodeSetupOnK8S 4 1 1 1 1 1 maprOnPods 3
-  	2.  Go to mapr_cluster_on_k8s directory; cd deploy/config/mapr_cluster_on_k8s
+  	2.  Go to mapr_cluster_on_k8s directory; cd deploy/config/mapr_cluster_on_k8s/MultiNodeSetup
   	3.  kubectl create -f maprclusternamespace.yaml
   	4.  kubectl create -f maprclusterconfigmap.yaml
   	5.  kubectl create -f maprusersecrets.yaml
@@ -75,8 +76,8 @@ D. Run sysbench fileio tests on pod persistent volume which is sitting on mapr
 
 	To install plugin and provisioner:
         ----------------------------------
-  	1. kubectl create -f maprfs-namespace.yaml
-  	2. kubectl create -f maprfs-RBAC.yaml
+  	1. Go to dir "cd deploy/config/volplugin/;" and run kubectl create -f kdf-namespace.yaml
+  	2. kubectl create -f kdf-rbac.yaml
   	3. kubectl create -f kdf-plugin-centos-customize.yaml
   	4. kubectl create -f kdf-provisioner-customize.yaml
 

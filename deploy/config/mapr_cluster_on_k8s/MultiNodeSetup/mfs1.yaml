@@ -42,7 +42,7 @@ spec:
                 command: ["bash", "-c", "/opt/mapr/plugin/pre-stop"]
           resources:
             requests:
-              memory: "65Gi"
+              memory: "20Gi"
               cpu: "5"
           ports:
           - containerPort: 5660

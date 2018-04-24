@@ -18,7 +18,7 @@ setupLabels() {
      NO_OF_DATA_NODES=$4
      NO_OF_WEB_NODES=$5
      COUNT=0
-     NO_OF_CLDB_DATA_RESERVE_NODES=`expr $NO_OF_CLDB_NODES + $NO_OF_DATA_NODES`
+     NO_OF_CLDB_DATA_RESERVE_NODES=`expr $NO_OF_RESERVE_NODES + $NO_OF_CLDB_NODES + $NO_OF_DATA_NODES`
 
 
      if [ $# -ne 5 ]
@@ -77,7 +77,7 @@ setupLabels() {
      for i in $($SEQ $((NO_OF_CLDB_NODES + NO_OF_DATA_NODES)) $((NO_OF_CLDB_NODES + NO_OF_DATA_NODES + NO_OF_WEB_NODES - 1)) )
      do
 	     #echo ${MAPR_NODES[$i]}
-	     kubectl label node ${MAPR_NODES[$i]} role=data --overwrite >/dev/null 2>&1
+	     kubectl label node ${MAPR_NODES[$i]} role=web --overwrite >/dev/null 2>&1
 	     dc=$((dc + 1))
 	     #echo $dc
      done
@@ -89,7 +89,7 @@ setupLabels() {
      for i in $($SEQ 0 $((${#MAPR_RESERVE_NODES[@]} - 1)))
      do
 	      #echo ${MAPR_RESERVE_NODES[$i]}
-	     kubectl label node ${MAPR_RESERVE_NODES[$i]} role=data --overwrite >/dev/null 2>&1
+	     kubectl label node ${MAPR_RESERVE_NODES[$i]} role=zk --overwrite >/dev/null 2>&1
 	     rc=$((rc + 1))
 	     #echo $rc
      done
@@ -119,8 +119,8 @@ copyInitAndServicesFiles() {
 	
 	 for (( j = 1; j <= $1; j++ ))
           do  
-            ssh $i mkdir -p /tmp/mfs"$j"_podbackup 2>&1 >/dev/null
-            ssh $i mkdir -p /root/k8s/mfs$j/logs  2>&1 >/dev/null
+            ssh $i mkdir -p /tmp/mfs"$j"_podbackup
+            ssh $i mkdir -p /root/k8s/mfs$j/logs 
             scp -p ./startup_scripts/mfs-init-script $i:/tmp/mfs"$j"_podbackup 2>&1 >/dev/null
 	    scp -p ./startup_scripts/container_init_services/mfs.service $i:/tmp/mfs"$j"_podbackup 2>&1 >/dev/null
           done
@@ -128,7 +128,6 @@ copyInitAndServicesFiles() {
          ssh $i mkdir -p /tmp/cldb_podbackup 2>&1 >/dev/null
          ssh $i mkdir -p /tmp/web_podbackup 2>&1 >/dev/null
          ssh $i mkdir -p /root/k8s/cldb/logs 2>&1 >/dev/null
-         ssh $i mkdir -p /root/k8s/zk/logs  2>&1 >/dev/null
 
          scp -p ./startup_scripts/mfsnodeinit $i:/tmp 2>&1 >/dev/null
          scp -p ./startup_scripts/cldbnodeinit $i:/tmp 2>&1 >/dev/null
@@ -149,10 +148,7 @@ removeConfDirectoryFromBackupBeforeStart() {
      for i in `kubectl get nodes --show-labels |grep -i role|awk '{print $1}'|grep -v NAME`
        do
 	 ssh $i rm -rf /tmp/cldb_podbackup/conf 2>&1 >/dev/null
-	 for (( j = 1; j <= $1; j++ )) 
-	  do
-	   ssh $i rm -rf /tmp/mfs"$1"_podbackup/conf 2>&1 >/dev/null
-	  done
+	 ssh $i rm -rf /tmp/mfs1_podbackup/conf 2>&1 >/dev/null
 	 ssh $i rm -rf /tmp/mfs2_podbackup/conf 2>&1 >/dev/null
 	 ssh $i rm -rf /tmp/web_podbackup/conf 2>&1 >/dev/null
       done
@@ -185,7 +181,7 @@ generateWebYamlFile() {
      #Remove older mfs yaml files from the parent folder
      rm -f ./../MultiNodeSetup/web.yaml
 
-     if [ $1 -gt 0 ]
+     if [ ! -z $1 ]
        then
         sed -e "s/replicas: 1/replicas: $1/g" ../conf/web.yaml >./../MultiNodeSetup/web.yaml
        fi
@@ -252,6 +248,8 @@ generateMfsYamlFile() {
 
 if [ $# -lt 7 ]
   then
+   #bold=$(tput bold)
+   #normal=$(tput sgr0)
    echo "${bold}Usage: MapRNodeSetupOnK8S   <TOTAL NODES>   <NO. OF ZOO NODES> \
   <NO.OF CLDB NODES> \
   <NO.OF DATA NODES> \
@@ -265,8 +263,8 @@ fi
 
 setupLabels $1 $2 $3 $4 $5
 addDiskForPod $6
-copyInitAndServicesFiles $6
-removeConfDirectoryFromBackupBeforeStart $6
+copyInitAndServicesFiles $4
+removeConfDirectoryFromBackupBeforeStart
 generateConfigMapWithClusterName $7 $3 $2 $8
 generateZooKeeperYamlFile $2
 generateCldbYamlFile $3
