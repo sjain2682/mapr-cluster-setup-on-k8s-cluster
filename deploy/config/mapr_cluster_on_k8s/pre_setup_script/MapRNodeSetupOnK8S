@@ -34,7 +34,7 @@ setupLabels() {
 	     exit 1;
      elif [[ (($NO_OF_NODES -lt $NO_OF_CLDB_DATA_RESERVE_NODES)) ]]
         then
-	     echo "Total number of nodes should be higher than no of nodes for cldb,datai,reserve and webserver"
+	     echo "Total number of nodes should be higher than no of nodes for cldb and data"
 	     exit 1;
      fi
      echo "Setting up the labels in K8S cluster nodes ..."
@@ -77,7 +77,7 @@ setupLabels() {
      for i in $($SEQ $((NO_OF_CLDB_NODES + NO_OF_DATA_NODES)) $((NO_OF_CLDB_NODES + NO_OF_DATA_NODES + NO_OF_WEB_NODES - 1)) )
      do
 	     #echo ${MAPR_NODES[$i]}
-	     kubectl label node ${MAPR_NODES[$i]} role=data --overwrite >/dev/null 2>&1
+	     kubectl label node ${MAPR_NODES[$i]} app=web --overwrite >/dev/null 2>&1
 	     dc=$((dc + 1))
 	     #echo $dc
      done
@@ -93,7 +93,7 @@ setupLabels() {
 	     rc=$((rc + 1))
 	     #echo $rc
      done
-
+     kubectl label node perf109-35.qa.lab role=nouse --overwrite
      echo "Successfully setup label in K8S cluster nodes"
 }
 
