@@ -1,6 +1,7 @@
 Assumption: 
 ---------------------------------
 1.Kubernetes cluster is installed and running on bare metal
+
 2.Nodes are setup with password less SSH between all K8S nodes
 
 
