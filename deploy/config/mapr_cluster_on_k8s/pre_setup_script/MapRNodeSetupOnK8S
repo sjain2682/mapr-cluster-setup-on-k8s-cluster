@@ -89,7 +89,7 @@ setupLabels() {
      for i in $($SEQ 0 $((${#MAPR_RESERVE_NODES[@]} - 1)))
      do
 	      #echo ${MAPR_RESERVE_NODES[$i]}
-	     kubectl label node ${MAPR_RESERVE_NODES[$i]} role=data --overwrite >/dev/null 2>&1
+	     kubectl label node ${MAPR_RESERVE_NODES[$i]} app=zk --overwrite >/dev/null 2>&1
 	     rc=$((rc + 1))
 	     #echo $rc
      done
