@@ -20,7 +20,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      role: data
+      app: zk
   minAvailable: 1
 ---
 apiVersion: apps/v1beta1
@@ -34,7 +34,7 @@ spec:
   template:
     metadata:
       labels:
-        role: data
+        app: zk
     spec:
       tolerations:
       - key: node-role.kubernetes.io/master
@@ -44,10 +44,10 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchExpressions:
-              - key: "role"
+              - key: "app"
                 operator: In
                 values:
-                - data
+                - zk
             topologyKey: "kubernetes.io/hostname"
       containers:
       - name: zk
