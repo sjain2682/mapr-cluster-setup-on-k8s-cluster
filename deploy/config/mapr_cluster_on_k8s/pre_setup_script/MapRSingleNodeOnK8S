@@ -52,12 +52,15 @@ copyInitAndServicesFiles() {
          scp -p ./startup_scripts/mfsnodeinit $i:/tmp 2>&1 >/dev/null
          scp -p ./startup_scripts/cldbnodeinit $i:/tmp 2>&1 >/dev/null
 	 scp -p ./startup_scripts/webnodeinit $i:/tmp 2>&1 >/dev/null
+	 scp -p ./startup_scripts/zknodeinit $i:/tmp 2>&1 >/dev/null
 
          scp -p ./startup_scripts/cldb-init-script $i:/tmp/cldb_podbackup 2>&1 >/dev/null
          scp -p ./startup_scripts/web-init-script $i:/tmp/web_podbackup 2>&1 >/dev/null
+         scp -p ./startup_scripts/zk-init-script $i:/tmp/zoo_podbackup 2>&1 >/dev/null
 	
 	 scp -p ./startup_scripts/container_init_services/web.service $i:/tmp/web_podbackup 2>&1 >/dev/null
 	 scp -p ./startup_scripts/container_init_services/cldb.service $i:/tmp/cldb_podbackup 2>&1 >/dev/null
+	 scp -p ./startup_scripts/container_init_services/zk.service $i:/tmp/zoo_podbackup 2>&1 >/dev/null
 
       done
      echo "successfully copied all services files for mapr cluster pods"

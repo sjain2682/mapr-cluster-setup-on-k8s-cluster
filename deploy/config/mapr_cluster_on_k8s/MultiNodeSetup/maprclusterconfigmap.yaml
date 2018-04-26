@@ -14,4 +14,4 @@ data:
   MAPR_TZ: "UTC"
   MAPR_HOME: "/opt/mapr"
   MAPR_PORT: "9443"
-  MAPR_MFS_DISKARGS: "8"
+  MAPR_MFS_DISKARGS: "3"

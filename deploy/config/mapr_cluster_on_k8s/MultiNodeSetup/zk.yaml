@@ -52,7 +52,6 @@ spec:
       - name: zk
         imagePullPolicy: Always
         image: docker.artifactory/maprtech/zk:6.0.0_4.0.0_centos7
-        #image: docker.artifactory/maprtech/zk:5.2.2_3.0.1_centos7
         securityContext:
           capabilities:
             add: ["SYS_ADMIN" , "NET_ADMIN", "NET_BROADCAST", "SYS_PACCT", "SYS_NICE", "SYS_RESOURCE", "SYS_RAWIO", "IPC_LOCK", "SYSLOG", "SYS_TIME"]
@@ -148,10 +147,7 @@ spec:
             secretKeyRef:
               name: mapr-user-secrets
               key: MAPR_ROOT_PASSWORD
-        command:
-        - /bin/bash
-        - -c
-        - exec /sbin/init
+        command: ["/bin/bash","-c","/tmp/zknodeinit"]
         livenessProbe:
           exec:
             command:
@@ -174,6 +170,8 @@ spec:
           name: zkdata
         - mountPath: /tmp/backup
           name: backup
+        - mountPath: /tmp/zknodeinit
+          name: initfile
       nodeSelector:
         env: mapr-cluster-node
         app: zk
@@ -193,6 +191,9 @@ spec:
           path: /root/k8s/zk/data
       - name: backup
         hostPath:
-          path: /tmp/zk_podbackup
+          path: /tmp/zoo_podbackup
+      - name: initfile
+        hostPath:
+          path: /tmp/zknodeinit
       - name: zkdata
         emptyDir: {}

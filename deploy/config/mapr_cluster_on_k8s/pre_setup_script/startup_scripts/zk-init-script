@@ -1,0 +1,94 @@
+#!/bin/bash
+MAPR_BACKUP=${MAPR_BACKUP:-/tmp/backup}
+MAPR_BACKUP_ZKDATA=${MAPR_BACKUP_ZKDATA:-/tmp/backup/zkdata}
+MAPR_HOME=${MAPR_HOME:-/opt/mapr}
+#MEM_TOTAL=6291456
+NO=0
+YES=1;
+SECURE_CLUSTER=$NO
+
+set_environment() {
+    # Import our environment variables from systemd
+    while read -r e; do
+        eval "export $e"
+    done <<< "$(tr "\000" "\n" < /proc/1/environ)"
+
+    # Copy modified conf files to container
+    if [ -d $MAPR_BACKUP/conf ]; then
+        cp -p $MAPR_BACKUP/conf/* $MAPR_HOME/conf/
+	cp -p $MAPR_BACKUP/hostid $MAPR_HOME/
+        cp -p $MAPR_BACKUP/zkdata $MAPR_HOME/zkdata
+       
+    else
+         echo "Conf file replacement volume not connected"
+    fi
+    printenv >>/tmp/init_script.log 2>&1
+    echo "MAPR_USER is $MAPR_USER" >>/tmp/init_script.log 2>&1
+    success $YES
+}
+
+addMapRUser() {
+        groupadd -g $MAPR_GID mapr >>/tmp/init_script.log 2>&1
+	useradd -u $MAPR_UID -g $MAPR_GID mapr >>/tmp/init_script.log 2>&1
+}
+
+startZooKeeper() {
+	service mapr-zookeeper start
+}
+
+setNodeMemory()  {
+
+        MEMTOTAL=$MAPR_MEMORY
+	MEMTOTAL=`expr $MAPR_MEMORY / 1024`
+        cp /proc/meminfo /opt/mapr/conf/meminfofake
+        sed -i "/^MemTotal/ s/^.*$/MemTotal:     ${MEMTOTAL} kB/" /opt/mapr/conf/meminfofake
+        sed -i "/^MemFree/ s/^.*$/MemFree:     ${MEMTOTAL-10} kB/" /opt/mapr/conf/meminfofake
+        sed -i "/^MemAvailable/ s/^.*$/MemAvailable:     ${MEMTOTAL-10} kB/" /opt/mapr/conf/meminfofake
+        sed -i ‘s!/proc/meminfo!/opt/mapr/conf/meminfofake!’ /opt/mapr/server/initscripts-common.sh
+}
+
+runConfigure() {
+	/opt/mapr/server/configure.sh -C $MAPR_CLDB_HOSTS -Z $MAPR_ZK_HOSTS -N $MAPR_CLUSTER -M7 >>/tmp/init_script.log 2>&1
+	startZooKeeper
+}
+
+changePasswd() {
+	echo "root:$MAPR_ROOT_PASSWORD" | chpasswd
+        echo "$MAPR_USER:$MAPR_PASSWORD" | chpasswd
+}
+
+backup() {
+	cp -pr /opt/mapr/conf /tmp/backup/
+	cp -p /opt/mapr/hostid /tmp/backup
+        cp -pr /opt/mapr/zkdata /tmp/backup/zkdata
+}
+
+zkDataBackup() {
+        rm -rf "$MAPR_BACKUP_ZKDATA".old
+        mv $MAPR_BACKUP_ZKDATA "$MAPR_BACKUP_ZKDATA".old
+	cp -pr /opt/mapr/zkdata /tmp/backup/
+}
+
+changeHostId() {
+	/opt/mapr/server/mruuidgen > /opt/mapr/hostid
+        cat /opt/mapr/hostid > /opt/mapr/conf/hostid.$$
+}
+
+echo "#######################################" >>/tmp/init_script.log 2>&1
+echo "###########INIT SCRIPT#################" >>/tmp/init_script.log 2>&1
+echo "#######################################" >>/tmp/init_script.log 2>&1
+set_environment
+echo $MAPR_UID >>/tmp/init_script.log 2>&1
+echo $MAPR_GID >>/tmp/init_script.log 2>&1
+addMapRUser
+changePasswd
+changeHostId
+setNodeMemory
+runConfigure
+backup
+echo "Successfully setup the node" >>/tmp/init_script.log 2>&1
+while true
+do
+sleep 5
+zkDataBackup
+done
