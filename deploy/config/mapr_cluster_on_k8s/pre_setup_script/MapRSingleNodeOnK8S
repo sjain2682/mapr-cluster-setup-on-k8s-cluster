@@ -93,8 +93,8 @@ generateZooKeeperYamlFile() {
      #Remove older zk yaml files from the parent folder
      rm -f ./../singleNodeSetup/zk.yaml
 
-     sed -e "s/role: cldb/role: all/g" ../conf/zk.yaml >./../singleNodeSetup/zk.yaml
-     sed -i "s/\- cldb/\- all/g" ./../singleNodeSetup/zk.yaml
+     sed -e "s/app: zk/role: all/g" ../conf/zk.yaml >./../singleNodeSetup/zk.yaml
+     sed -i "s/\- zk/\- all/g" ./../singleNodeSetup/zk.yaml
      echo "Successfully generated zk yaml file ..."
 }
 
@@ -115,8 +115,8 @@ generateWebYamlFile() {
      echo "generating web yaml file ..."
      #Remove older mfs yaml files from the parent folder
      rm -f ./../singleNodeSetup/web.yaml
-     sed -e "s/role: data/role: all/g" ../conf/web.yaml >./../singleNodeSetup/web.yaml
-     sed -i "s/\- data/\- all/g" ./../singleNodeSetup/web.yaml
+     sed -e "s/ui: web/role: all/g" ../conf/web.yaml >./../singleNodeSetup/web.yaml
+     sed -i "s/\- web/\- all/g" ./../singleNodeSetup/web.yaml
      echo "Successfully generated web yaml file ..."
 }
 
