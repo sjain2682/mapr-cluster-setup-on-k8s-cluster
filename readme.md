@@ -42,15 +42,16 @@ D. Run sysbench fileio tests on pod persistent volume which is sitting on mapr
 	To install mapr multi nodes/pods cluster:
 	-----------------------------------------
   	1.  Run cd deploy/config/mapr_cluster_on_k8s/pre_setup_script; ./MapRNodeSetupOnK8S 
-	     Script Parameters: MapRNodeSetupOnK8S   
-	     TOTAL NODES: Total number of physical nodes where mapr pods will be deployed. Sum of no of CLDB nodes and data nodes equal to total nodes
-	     NO. OF ZOO NODES: Number of zookeeper. Zookeeper pod don't use raw disks so it can run on any node
-             NO.OF CLDB NODES: Number of CLDB nodes. 
-	     NO.OF DATA NODES: Number of data nodes.
-             NO.OF WEB NODES: Number of webserver node.
-	     NO. OF MFS POD PER DATA NODE: Number of mfs pods per data nodes.
-	     MAPR CLUSTER NAME: Provide a name to mapr cluster.
-	     DISK_WIDTH: This is optional parameter, if not provied disk width will be choosen as default value 3.
+
+	    Script Parameters: MapRNodeSetupOnK8S   
+	    TOTAL NODES: 			Total number of physical nodes where mapr pods will be deployed. Sum of no of CLDB nodes and data nodes equal to total nodes.
+	    NO. OF ZOO NODES: 			Number of zookeeper. Zookeeper pod don't use raw disks so it can run on any node.
+            NO.OF CLDB NODES: 			Number of CLDB nodes. 
+	    NO.OF DATA NODES: 			Number of data nodes.
+            NO.OF WEB NODES: 			Number of webserver node.
+	    NO. OF MFS POD PER DATA NODE: 	Number of mfs pods per data nodes.
+	    MAPR CLUSTER NAME: 			Provide a name to mapr cluster.
+	    DISK_WIDTH: 			This is optional parameter, if not provied disk width will be choosen as default value 3.
       	    example: ./MapRNodeSetupOnK8S 4 3 2 2 1 1 maprOnPods 3
   	2.  Go to mapr_cluster_on_k8s directory; cd deploy/config/mapr_cluster_on_k8s/MultiNodeSetup
   	3.  kubectl create -f maprclusternamespace.yaml
