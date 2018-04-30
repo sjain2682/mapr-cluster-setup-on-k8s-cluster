@@ -73,6 +73,7 @@ removeConfDirectoryFromBackupBeforeStart() {
 	 ssh $i rm -rf /tmp/cldb_podbackup/conf 2>&1 >/dev/null
 	 ssh $i rm -rf /tmp/web_podbackup/conf 2>&1 >/dev/null
 	 ssh $i rm -rf /tmp/zoo_podbackup/conf 2>&1 >/dev/null
+	 ssh $i rm -rf /tmp/zoo_podbackup/zkdata 2>&1 >/dev/null
       done
      echo "Successfully cleanup up the old files"
 }
