@@ -54,7 +54,7 @@ D. Run sysbench fileio tests on pod persistent volume which is sitting on mapr
 
 	    	NO.OF DATA NODES: 		Number of data nodes
 
-            	NO.OF WEB NODES: 		Number of webserver node
+		NO.OF WEB NODES: 		Number of webserver node
 
 	    	NO. OF MFS POD PER DATA NODE: 	Number of mfs pods per data node
 
