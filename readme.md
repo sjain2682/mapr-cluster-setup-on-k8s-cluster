@@ -62,7 +62,7 @@ D. Run sysbench fileio tests on pod persistent volume which is sitting on mapr
 
 	    	DISK_WIDTH: 			This is optional parameter. Default value is 3
 
-      	    	example: ./MapRNodeSetupOnK8S 4 3 2 2 1 1 maprOnPods 3
+		example: ./MapRNodeSetupOnK8S 4 3 2 2 1 1 maprOnPods 3
 
   	2.  Go to mapr_cluster_on_k8s directory; cd deploy/config/mapr_cluster_on_k8s/MultiNodeSetup
   	3.  kubectl create -f maprclusternamespace.yaml
